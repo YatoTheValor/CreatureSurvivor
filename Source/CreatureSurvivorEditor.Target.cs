@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class CreatureSurvivorNewTarget : TargetRules
+public class CreatureSurvivorEditorTarget : TargetRules
 {
-	public CreatureSurvivorNewTarget(TargetInfo Target) : base(Target)
+	public CreatureSurvivorEditorTarget( TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Game;
+		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_6;
-		ExtraModuleNames.Add("CreatureSurvivorNew");
+		ExtraModuleNames.Add("CreatureSurvivor");
 	}
 }

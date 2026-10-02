@@ -1,21 +1,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "BaseCharacter.h"
 
 #include "InputAction.h"
 #include "InputActionValue.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-#include "CreatureSurvivorPlayer.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
 class UInputMappingContext;
 
+#include "CreatureSurvivorPlayer.generated.h"
+
 UCLASS()
-class CREATURESURVIVORNEW_API ACreatureSurvivorPlayer : public ACharacter
+class CREATURESURVIVOR_API ACreatureSurvivorPlayer : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -27,17 +28,22 @@ protected:
 	virtual void BeginPlay() override;
 
 
-public:	
+public:
+
+	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere, Category="Input")
+	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* MoveAction;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* FireAction;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	USpringArmComponent* CameraBoom;
 
@@ -46,4 +52,5 @@ public:
 
 	void MoveInput(const FInputActionValue& Value);
 
+	void RotateToMouse();
 };

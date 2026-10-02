@@ -3,20 +3,13 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values
 ACreatureSurvivorPlayer::ACreatureSurvivorPlayer()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
-	// Character does not rotate based on controller rotation
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
-	// Character does not rotate when moving
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 
 	// Create the Camera Boom
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -35,7 +28,7 @@ ACreatureSurvivorPlayer::ACreatureSurvivorPlayer()
 
 	// Create camera
 	TopDownCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	TopDownCamera->SetupAttachment(CameraBoom,USpringArmComponent::SocketName);
+	TopDownCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
 	TopDownCamera->bUsePawnControlRotation = false;
 }
@@ -44,7 +37,7 @@ ACreatureSurvivorPlayer::ACreatureSurvivorPlayer()
 void ACreatureSurvivorPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer())
@@ -57,6 +50,13 @@ void ACreatureSurvivorPlayer::BeginPlay()
 	}
 }
 
+void ACreatureSurvivorPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	RotateToMouse();
+}
+
 
 // Called to bind functionality to input
 void ACreatureSurvivorPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -65,7 +65,8 @@ void ACreatureSurvivorPlayer::SetupPlayerInputComponent(UInputComponent* PlayerI
 
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EIC->BindAction(MoveAction,ETriggerEvent::Triggered,this,&ACreatureSurvivorPlayer::MoveInput);
+		EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACreatureSurvivorPlayer::MoveInput);
+		EIC->BindAction(FireAction, ETriggerEvent::Started, this, &ACreatureSurvivorPlayer::Fire);
 	}
 }
 
@@ -73,9 +74,27 @@ void ACreatureSurvivorPlayer::MoveInput(const FInputActionValue& Value)
 {
 	const FVector2D InputVector = Value.Get<FVector2D>();
 
-	AddMovementInput(FVector::ForwardVector, InputVector.Y);
-	AddMovementInput(FVector::RightVector, InputVector.X);
+	MoveCharacter(FVector::ForwardVector, InputVector.Y);
+	MoveCharacter(FVector::RightVector, InputVector.X);
 }
 
+void ACreatureSurvivorPlayer::RotateToMouse()
+{
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+
+	if(!PlayerController)
+	{
+		return;
+	}
+
+	FHitResult HitResult;
+
+	if(!PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
+	{
+		return;
+	}
+
+	RotateCharacter(HitResult.ImpactPoint);
+}
 
 

@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class CreatureSurvivorNew : ModuleRules
+public class CreatureSurvivor : ModuleRules
 {
-	public CreatureSurvivorNew(ReadOnlyTargetRules Target) : base(Target)
+	public CreatureSurvivor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
