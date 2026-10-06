@@ -7,6 +7,12 @@ Saved/
 .idea/
 Plugins/Developer/
 
+# FAB
+Content/Fab/
+Content/NiagaraExamples/
+Content/LPCharacters_FREE
+Content/Survival_Character/
+
 # Bestanden
 *.VC.db
 *.opensdf
