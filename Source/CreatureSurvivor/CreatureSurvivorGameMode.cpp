@@ -41,3 +41,27 @@ void ACreatureSurvivorGameMode::BeginPlay()
 		LoopIndex++;
 	}
 }
+
+void ACreatureSurvivorGameMode::ActorDied(AActor* DeadActor)
+{
+	if (DeadActor == Player)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Player died, Defeated!"));
+	}
+	else
+	{
+		ACreatureSurvivorEnemy* DeadEnemy = Cast<ACreatureSurvivorEnemy>(DeadActor);
+		if (DeadEnemy)
+		{
+			//DeadTower
+			DeadEnemy->Destroy();
+			UE_LOG(LogTemp, Display, TEXT(" A Enemy just died"));
+			EnemyCount--;
+			if (EnemyCount == 0)
+			{
+				UE_LOG(LogTemp, Display, TEXT("All enemies destroyed, You won!"));
+			}
+		}
+	}
+}
+

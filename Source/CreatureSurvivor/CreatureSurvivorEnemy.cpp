@@ -7,6 +7,9 @@ void ACreatureSurvivorEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FTimerHandle FireTimerHandle;
+	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &ACreatureSurvivorEnemy::CheckFireCondition, FireRate, true);
+
 }
 
 void ACreatureSurvivorEnemy::Tick(float DeltaTime)
@@ -16,5 +19,13 @@ void ACreatureSurvivorEnemy::Tick(float DeltaTime)
 	if (Player)
 	{
 		RotateCharacter(Player->GetActorLocation());
+	}
+}
+
+void ACreatureSurvivorEnemy::CheckFireCondition()
+{
+	if (Player)
+	{
+		Fire();
 	}
 }

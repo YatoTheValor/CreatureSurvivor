@@ -26,6 +26,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	float FireRate = 2.0f;
 
 	ACreatureSurvivorPlayer* Player;
+	
+	void CheckFireCondition();
 };

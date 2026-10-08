@@ -2,6 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
+#include "Projectile.h"
+
 #include "BaseCharacter.generated.h"
 
 UCLASS()
@@ -18,6 +21,9 @@ protected:
 public:
 	UPROPERTY(VisibleAnywhere, Category="Combat")
 	USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectile> ProjectileClass;
 
 	void RotateCharacter(const FVector& LookAtTarget);
 

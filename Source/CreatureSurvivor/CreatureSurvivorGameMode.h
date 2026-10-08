@@ -24,4 +24,6 @@ protected:
 public:
 	ACreatureSurvivorPlayer* Player;
 	int32 EnemyCount;
+
+	void ActorDied(AActor* DeadActor);
 };
