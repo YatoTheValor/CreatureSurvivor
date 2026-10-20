@@ -28,4 +28,6 @@ public:
 	void RotateCharacter(const FVector& LookAtTarget);
 
 	void Fire();
+
+	void HandleDestruction();
 };

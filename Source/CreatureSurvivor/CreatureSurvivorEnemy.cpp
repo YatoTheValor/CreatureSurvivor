@@ -29,3 +29,9 @@ void ACreatureSurvivorEnemy::CheckFireCondition()
 		Fire();
 	}
 }
+
+void ACreatureSurvivorEnemy::HandleDestruction()
+{
+	Super::HandleDestruction();
+	Destroy();
+}

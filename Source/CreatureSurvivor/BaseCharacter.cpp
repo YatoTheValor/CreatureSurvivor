@@ -43,3 +43,7 @@ void ABaseCharacter::Fire()
 		Projectile->SetOwner(this);
 	}
 }
+
+void ABaseCharacter::HandleDestruction()
+{
+}

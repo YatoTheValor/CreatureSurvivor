@@ -50,7 +50,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* TopDownCamera;
 
+	APlayerController* PlayerController;
+
+	bool IsAlive = true;
+
 	void MoveInput(const FInputActionValue& Value);
 
 	void RotateToMouse();
+
+	void HandleDestruction();
+
+	void SetPlayerEnabled(bool Enabled);
 };

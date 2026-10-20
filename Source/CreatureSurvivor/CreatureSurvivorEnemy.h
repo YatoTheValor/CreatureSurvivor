@@ -32,4 +32,6 @@ public:
 	ACreatureSurvivorPlayer* Player;
 	
 	void CheckFireCondition();
+
+	void HandleDestruction();
 };

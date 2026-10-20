@@ -5,6 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "CreatureSurvivorEnemy.h"
+#include "CreatureSurvivorGameInstance.h"
 
 void ACreatureSurvivorGameMode::BeginPlay()
 {
@@ -40,28 +41,99 @@ void ACreatureSurvivorGameMode::BeginPlay()
 
 		LoopIndex++;
 	}
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PlayerController)
+	{
+		ScreenMessageWidget = CreateWidget<UScreenMessage>(PlayerController, ScreenMessageClass);
+		if (ScreenMessageWidget)
+		{
+			ScreenMessageWidget->AddToPlayerScreen();
+			ScreenMessageWidget->SetMessageText("Get Ready!");
+		}
+	}
+
+	CountdownSeconds = CountdownDelay;
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ACreatureSurvivorGameMode::OnCountdownTimerTimeout, 1.0f, true);
+}
+
+void ACreatureSurvivorGameMode::OnCountdownTimerTimeout()
+{
+	CountdownSeconds -= 1;
+
+	if (CountdownSeconds > 0)
+	{
+		ScreenMessageWidget->SetMessageText(FString::FromInt(CountdownSeconds));
+	}
+	else if (CountdownSeconds == 0)
+	{
+		ScreenMessageWidget->SetMessageText("Go!");
+		Player->SetPlayerEnabled(true);
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
+		ScreenMessageWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void ACreatureSurvivorGameMode::ActorDied(AActor* DeadActor)
 {
+	bool IsGameOver = false;
+
 	if (DeadActor == Player)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Player died, Defeated!"));
+		Player->HandleDestruction();
+		IsGameOver = true;
 	}
 	else
 	{
 		ACreatureSurvivorEnemy* DeadEnemy = Cast<ACreatureSurvivorEnemy>(DeadActor);
 		if (DeadEnemy)
 		{
-			//DeadTower
-			DeadEnemy->Destroy();
-			UE_LOG(LogTemp, Display, TEXT(" A Enemy just died"));
+
+			DeadEnemy->HandleDestruction();
+
 			EnemyCount--;
 			if (EnemyCount == 0)
 			{
-				UE_LOG(LogTemp, Display, TEXT("All enemies destroyed, You won!"));
+				IsGameOver = true;
+				IsVictory = true;
+			}
+		}
+	}
+
+	if (IsGameOver)
+	{
+		FString GameOverString = IsVictory ? "Victory!" : "Defeat!";
+
+		ScreenMessageWidget->SetVisibility(ESlateVisibility::Visible);
+		ScreenMessageWidget->SetMessageText(GameOverString);
+
+		FTimerHandle FireTimerHandle;
+		GetWorldTimerManager().SetTimer(FireTimerHandle, this, &ACreatureSurvivorGameMode::OnGameOverTimerTimeout, GameOverDelay, false);
+	}
+}
+
+void ACreatureSurvivorGameMode::OnGameOverTimerTimeout()
+{
+	UGameInstance* GameInstance = GetGameInstance();
+	if (GameInstance)
+	{
+		UCreatureSurvivorGameInstance* CreatureSurvivorGameInstance = Cast<UCreatureSurvivorGameInstance>(GameInstance);
+		if (CreatureSurvivorGameInstance)
+		{
+			if (IsVictory)
+			{
+				CreatureSurvivorGameInstance->LoadNextLevel();
+			}
+			else
+			{
+				CreatureSurvivorGameInstance->RestartCurrentLevel();
 			}
 		}
 	}
 }
+
+
 

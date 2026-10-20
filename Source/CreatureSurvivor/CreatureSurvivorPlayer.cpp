@@ -38,7 +38,9 @@ void ACreatureSurvivorPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	PlayerController = Cast<APlayerController>(Controller);
+
+	if (PlayerController)
 	{
 		if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer())
 		{
@@ -48,6 +50,8 @@ void ACreatureSurvivorPlayer::BeginPlay()
 			}
 		}
 	}
+
+	SetPlayerEnabled(false);
 }
 
 void ACreatureSurvivorPlayer::Tick(float DeltaTime)
@@ -80,7 +84,7 @@ void ACreatureSurvivorPlayer::MoveInput(const FInputActionValue& Value)
 
 void ACreatureSurvivorPlayer::RotateToMouse()
 {
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	PlayerController = Cast<APlayerController>(Controller);
 
 	if(!PlayerController)
 	{
@@ -95,6 +99,33 @@ void ACreatureSurvivorPlayer::RotateToMouse()
 	}
 
 	RotateCharacter(HitResult.ImpactPoint);
+}
+
+void ACreatureSurvivorPlayer::HandleDestruction()
+{
+	Super::HandleDestruction();
+
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+	SetPlayerEnabled(false);
+	IsAlive = false;
+}
+
+void ACreatureSurvivorPlayer::SetPlayerEnabled(bool Enabled)
+{
+	if(PlayerController)
+	{
+		if (Enabled)
+		{
+			EnableInput(PlayerController);
+		}
+		else
+		{
+			DisableInput(PlayerController);
+		}
+
+		PlayerController->bShowMouseCursor = Enabled;
+	}
 }
 
 

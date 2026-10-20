@@ -7,6 +7,9 @@
 
 #include "GameFramework/ProjectileMovementComponent.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
 #include "Projectile.generated.h"
 
 UCLASS()
