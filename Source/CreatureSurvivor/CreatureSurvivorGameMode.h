@@ -7,6 +7,7 @@
 
 #include "CreatureSurvivorPlayer.h"
 #include "ScreenMessage.h"
+#include "HUDWidget.h"
 
 #include "CreatureSurvivorGameMode.generated.h"
 
@@ -29,6 +30,11 @@ public:
 
 	UScreenMessage* ScreenMessageWidget;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UHUDWidget> HUDWidgetClass;
+
+	UHUDWidget* HUDWidget;
+
 	ACreatureSurvivorPlayer* Player;
 	int32 EnemyCount;
 
@@ -44,7 +50,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float GameOverDelay = 3.0f;
 
-	void ActorDied(AActor* DeadActor);
+	void ActorDied(AActor* DeadActor, AController* KillerController);
+
+	void UpdatePlayerLevelHUD();
 
 	void OnGameOverTimerTimeout();
 

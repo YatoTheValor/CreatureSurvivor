@@ -30,6 +30,8 @@ void UHealthComponent::BeginPlay()
 	{
 		CreatureSurvivorGameMode = Cast<ACreatureSurvivorGameMode>(GameMode);
 	}
+	
+	UpdateHUD();
 }
 
 
@@ -43,16 +45,33 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UHealthComponent::OnDamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage > 0.0f)
+	if (Damage <= 0.0f)
 	{
-		Health -= Damage;
-		if (Health <= 0.0f)
-		{
-			if (CreatureSurvivorGameMode)
-			{
-				CreatureSurvivorGameMode->ActorDied(DamagedActor);
-			}
-		}
+		return;
 	}
+
+	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+
+	UpdateHUD();
+
+	if (Health <= 0.0f && CreatureSurvivorGameMode)
+	{
+		CreatureSurvivorGameMode->ActorDied(DamagedActor, InstigatedBy);
+	}
+}
+
+void UHealthComponent::UpdateHUD()
+{
+	if (!CreatureSurvivorGameMode ||
+		!CreatureSurvivorGameMode->HUDWidget ||
+		!CreatureSurvivorGameMode->Player ||
+		GetOwner() != CreatureSurvivorGameMode->Player ||
+		MaxHealth <= 0.0f)
+	{
+		return;
+	}
+
+	const float HealthPercent = Health / MaxHealth;
+	CreatureSurvivorGameMode->HUDWidget->SetHealthBarPercent(HealthPercent);
 }
 

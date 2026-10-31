@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "CreatureSurvivorEnemy.h"
 #include "CreatureSurvivorGameInstance.h"
+#include "LevelingComponent.h"
 
 void ACreatureSurvivorGameMode::BeginPlay()
 {
@@ -55,6 +56,13 @@ void ACreatureSurvivorGameMode::BeginPlay()
 
 	CountdownSeconds = CountdownDelay;
 	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ACreatureSurvivorGameMode::OnCountdownTimerTimeout, 1.0f, true);
+
+	HUDWidget = CreateWidget<UHUDWidget>(PlayerController, HUDWidgetClass);
+	if (HUDWidget)
+	{
+		HUDWidget->AddToPlayerScreen();
+		UpdatePlayerLevelHUD();
+	}
 }
 
 void ACreatureSurvivorGameMode::OnCountdownTimerTimeout()
@@ -77,7 +85,7 @@ void ACreatureSurvivorGameMode::OnCountdownTimerTimeout()
 	}
 }
 
-void ACreatureSurvivorGameMode::ActorDied(AActor* DeadActor)
+void ACreatureSurvivorGameMode::ActorDied(AActor* DeadActor, AController* KillerController)
 {
 	bool IsGameOver = false;
 
@@ -91,8 +99,17 @@ void ACreatureSurvivorGameMode::ActorDied(AActor* DeadActor)
 		ACreatureSurvivorEnemy* DeadEnemy = Cast<ACreatureSurvivorEnemy>(DeadActor);
 		if (DeadEnemy)
 		{
-
 			DeadEnemy->HandleDestruction();
+
+			if (Player && KillerController == Player->GetController())
+			{
+				ULevelingComponent* LevelingComponent = Player->FindComponentByClass<ULevelingComponent>();
+				if (LevelingComponent)
+				{
+					LevelingComponent->AddExperience(DeadEnemy->ExperienceReward);
+					UpdatePlayerLevelHUD();
+				}
+			}
 
 			EnemyCount--;
 			if (EnemyCount == 0)
@@ -113,6 +130,28 @@ void ACreatureSurvivorGameMode::ActorDied(AActor* DeadActor)
 		FTimerHandle FireTimerHandle;
 		GetWorldTimerManager().SetTimer(FireTimerHandle, this, &ACreatureSurvivorGameMode::OnGameOverTimerTimeout, GameOverDelay, false);
 	}
+}
+
+void ACreatureSurvivorGameMode::UpdatePlayerLevelHUD()
+{
+	if (!Player || !HUDWidget)
+	{
+		return;
+	}
+
+	ULevelingComponent* LevelingComponent = Player->FindComponentByClass<ULevelingComponent>();
+	if (!LevelingComponent || LevelingComponent->ExperienceToNextLevel <= 0)
+	{
+		return;
+	}
+
+	const float ExperiencePercent =
+		static_cast<float>(LevelingComponent->CurrentExperience) /
+		static_cast<float>(LevelingComponent->ExperienceToNextLevel);
+
+	HUDWidget->SetExperienceBarPercent(ExperiencePercent);
+	HUDWidget->SetLevelText(LevelingComponent->CurrentLevel);
+	HUDWidget->SetExperienceText(LevelingComponent->CurrentExperience,LevelingComponent->ExperienceToNextLevel);
 }
 
 void ACreatureSurvivorGameMode::OnGameOverTimerTimeout()

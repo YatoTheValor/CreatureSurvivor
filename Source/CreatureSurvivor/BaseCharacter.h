@@ -27,6 +27,7 @@ public:
 
 	void RotateCharacter(const FVector& LookAtTarget);
 
+	UFUNCTION()
 	void Fire();
 
 	void HandleDestruction();

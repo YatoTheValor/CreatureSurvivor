@@ -26,8 +26,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	float FireRate = 2.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Progression")
+	int32 ExperienceReward = 25;
 
 	ACreatureSurvivorPlayer* Player;
 	
