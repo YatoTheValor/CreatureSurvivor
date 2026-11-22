@@ -32,7 +32,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Progression")
 	int32 ExperienceReward = 25;
 
-	ACreatureSurvivorPlayer* Player;
+	UPROPERTY()
+	TObjectPtr<ACreatureSurvivorPlayer> Player;
+
+	FTimerHandle FireTimerHandle;
 	
 	void CheckFireCondition();
 

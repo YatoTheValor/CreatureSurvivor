@@ -34,14 +34,21 @@ void ABaseCharacter::RotateCharacter(const FVector& LookAtTarget)
 
 void ABaseCharacter::Fire()
 {
-	FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
-	FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+    if (!ProjectileClass || !ProjectileSpawnPoint || !GetWorld())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Cannot fire: Missing projectile configuration!"));
+        return;
+    }
 
-	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-	if (Projectile)
-	{
-		Projectile->SetOwner(this);
-	}
+    FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+    FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+
+    AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass,SpawnLocation, SpawnRotation);
+
+    if (Projectile)
+    {
+        Projectile->SetOwner(this);
+    }
 }
 
 void ABaseCharacter::HandleDestruction()

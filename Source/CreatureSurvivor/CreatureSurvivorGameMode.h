@@ -36,9 +36,6 @@ public:
 	UHUDWidget* HUDWidget;
 
 	ACreatureSurvivorPlayer* Player;
-	int32 EnemyCount;
-
-	float IsVictory = false;
 
 	UPROPERTY(EditAnywhere)
 	int32 CountdownDelay = 3;
@@ -46,6 +43,8 @@ public:
 	int32 CountdownSeconds;
 
 	FTimerHandle CountdownTimerHandle;
+
+	FTimerHandle GameOverTimerHandle;
 
 	UPROPERTY(EditAnywhere)
 	float GameOverDelay = 3.0f;
